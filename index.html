@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Web Development Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .quiz-container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      width: 350px;
+      max-width: 90%;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #choices {
+      list-style: none;
+      padding: 0;
+    }
+
+    #choices li {
+      margin: 10px 0;
+    }
+
+    #choices button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background: #eee;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #choices button:hover {
+      background: #d3e3fc;
+    }
+
+    button#next-btn {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button#next-btn:hover {
+      background: #0056b3;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #score {
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Web Development Quiz</h1>
+    <div id="quiz">
+      <p id="question">Question text</p>
+      <ul id="choices"></ul>
+      <button id="next-btn" class="hidden">Next</button>
+      <p id="score" class="hidden"></p>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "What does HTML stand for?",
+        choices: [
+          "Hyper Trainer Marking Language",
+          "Hyper Text Marketing Language",
+          "Hyper Text Markup Language",
+          "Hyperlink and Text Markup Language"
+        ],
+        answer: "Hyper Text Markup Language"
+      },
+      {
+        question: "Which HTML tag is used to create a hyperlink?",
+        choices: ["<link>", "<a>", "<href>", "<hyperlink>"],
+        answer: "<a>"
+      },
+      {
+        question: "What does CSS stand for?",
+        choices: [
+          "Creative Style System",
+          "Cascading Style Sheets",
+          "Computer Style Syntax",
+          "Colorful Style Sheets"
+        ],
+        answer: "Cascading Style Sheets"
+      },
+      {
+        question: "Which property is used to change the background color in CSS?",
+        choices: ["color", "backgroundColor", "bgColor", "background-color"],
+        answer: "background-color"
+      },
+      {
+        question: "Which HTML tag is used for inserting a line break?",
+        choices: ["<br>", "<lb>", "<break>", "<line>"],
+        answer: "<br>"
+      },
+      {
+        question: "What does the 'id' attribute in HTML do?",
+        choices: [
+          "Changes font style",
+          "Sets an element's background color",
+          "Assigns a unique identifier to an element",
+          "Adds an image"
+        ],
+        answer: "Assigns a unique identifier to an element"
+      },
+      {
+        question: "Which CSS property controls the text size?",
+        choices: ["font-weight", "text-size", "font-size", "text-style"],
+        answer: "font-size"
+      },
+      {
+        question: "In JavaScript, which keyword is used to declare a variable?",
+        choices: ["var", "let", "const", "All of the above"],
+        answer: "All of the above"
+      },
+      {
+        question: "Which symbol is used for comments in CSS?",
+        choices: ["//", "#", "<!-- -->", "/* */"],
+        answer: "/* */"
+      },
+      {
+        question: "What is the correct syntax to link a CSS file to an HTML file?",
+        choices: [
+          "<style src='style.css'>",
+          "<link rel='stylesheet' href='style.css'>",
+          "<css>style.css</css>",
+          "<stylesheet>style.css</stylesheet>"
+        ],
+        answer: "<link rel='stylesheet' href='style.css'>"
+      },
+      {
+        question: "What is the DOM in web development?",
+        choices: [
+          "Document Object Model",
+          "Data Object Map",
+          "Dynamic Output Method",
+          "Desktop Orientation Mode"
+        ],
+        answer: "Document Object Model"
+      },
+      {
+        question: "Which event is triggered when a user clicks on an HTML element?",
+        choices: ["onchange", "onhover", "onclick", "onmouseclick"],
+        answer: "onclick"
+      },
+      {
+        question: "Which method is used to output text in the browser console in JavaScript?",
+        choices: ["console.write()", "log.console()", "console.log()", "print()"],
+        answer: "console.log()"
+      },
+      {
+        question: "Which HTML tag is used to display an image?",
+        choices: ["<img>", "<image>", "<pic>", "<src>"],
+        answer: "<img>"
+      },
+      {
+        question: "Which attribute is used in HTML to define inline styles?",
+        choices: ["style", "class", "css", "font"],
+        answer: "style"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById("question");
+    const choicesEl = document.getElementById("choices");
+    const nextBtn = document.getElementById("next-btn");
+    const scoreEl = document.getElementById("score");
+
+    function loadQuestion() {
+      const current = quizData[currentQuestion];
+      questionEl.textContent = current.question;
+      choicesEl.innerHTML = "";
+      questionEl.classList.remove("hidden");
+      choicesEl.classList.remove("hidden");
+
+      current.choices.forEach(choice => {
+        const li = document.createElement("li");
+        const button = document.createElement("button");
+        button.textContent = choice;
+        button.onclick = () => checkAnswer(choice);
+        li.appendChild(button);
+        choicesEl.appendChild(li);
+      });
+
+      nextBtn.classList.add("hidden");
+    }
+
+    function checkAnswer(selected) {
+      const correct = quizData[currentQuestion].answer;
+      if (selected === correct) {
+        score++;
+      }
+      nextBtn.classList.remove("hidden");
+
+      const buttons = choicesEl.querySelectorAll("button");
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correct) {
+          btn.style.background = "#c8e6c9";
+        } else if (btn.textContent === selected) {
+          btn.style.background = "#ffcdd2"; 
+        }
+      });
+    }
+
+    nextBtn.addEventListener("click", () => {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showScore();
+      }
+    });
+
+    function showScore() {
+      questionEl.classList.add("hidden");
+      choicesEl.classList.add("hidden");
+      nextBtn.classList.add("hidden");
+      scoreEl.textContent = `You scored ${score} out of ${quizData.length}`;
+      scoreEl.classList.remove("hidden");
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
